@@ -2,6 +2,7 @@
 #include <filesystem>
 
 #include <lib/JsonHelpers.h>
+#include "util.h"
 
 #include <CppUnitTestLogger.h>
 
@@ -759,6 +760,8 @@ namespace FancyZonesUnitTests
         const json::JsonValue m_defaultCustomDeviceValue = json::JsonValue::Parse(m_defaultCustomDeviceStr);
         const json::JsonObject m_defaultCustomDeviceObj = json::JsonObject::Parse(m_defaultCustomDeviceStr);
 
+        HINSTANCE m_hInst{};
+
         void compareJsonArrays(const json::JsonArray& expected, const json::JsonArray& actual)
         {
             Assert::AreEqual(expected.Size(), actual.Size());
@@ -766,6 +769,11 @@ namespace FancyZonesUnitTests
             {
                 compareJsonObjects(expected.GetObjectAt(i), actual.GetObjectAt(i));
             }
+        }
+
+        TEST_METHOD_INITIALIZE(Init)
+        {
+            m_hInst = (HINSTANCE)GetModuleHandleW(nullptr);
         }
 
     public:
@@ -1482,6 +1490,107 @@ namespace FancyZonesUnitTests
             }
 
             Assert::IsTrue(actual);
+        }
+
+        TEST_METHOD(AppLastZoneIndex)
+        {
+            const auto window = Mocks::WindowCreate(m_hInst);
+            FancyZonesData data;
+
+            Assert::AreEqual(-1, data.GetAppLastZoneIndex(window));
+
+            const int expectedZoneIndex = 10;
+            Assert::IsTrue(data.SetAppLastZone(window, expectedZoneIndex));
+            Assert::AreEqual(expectedZoneIndex, data.GetAppLastZoneIndex(window));
+        }
+
+        TEST_METHOD(AppLastZoneIndexZero)
+        {
+            const auto window = Mocks::WindowCreate(m_hInst);
+            FancyZonesData data;
+
+            const int expectedZoneIndex = 0;
+            Assert::IsTrue(data.SetAppLastZone(window, expectedZoneIndex));
+            Assert::AreEqual(expectedZoneIndex, data.GetAppLastZoneIndex(window));
+        }
+
+        TEST_METHOD(AppLastZoneIndexNegative)
+        {
+            const auto window = Mocks::WindowCreate(m_hInst);
+            FancyZonesData data;
+
+            const int expectedZoneIndex = -1;
+            Assert::IsTrue(data.SetAppLastZone(window, expectedZoneIndex));
+            Assert::AreEqual(expectedZoneIndex, data.GetAppLastZoneIndex(window));
+        }
+
+        TEST_METHOD(AppLastZoneIndexOverflow)
+        {
+            const auto window = Mocks::WindowCreate(m_hInst);
+            FancyZonesData data;
+
+            const long expectedZoneIndex = LONG_MAX;
+            Assert::IsTrue(data.SetAppLastZone(window, expectedZoneIndex));
+            Assert::AreEqual(static_cast<int>(expectedZoneIndex), data.GetAppLastZoneIndex(window));
+        }
+
+        TEST_METHOD(AppLastZoneIndexOverride)
+        {
+            const auto window = Mocks::WindowCreate(m_hInst);
+            FancyZonesData data;
+
+            const int expectedZoneIndex = 3;
+            Assert::IsTrue(data.SetAppLastZone(window, 1));
+            Assert::IsTrue(data.SetAppLastZone(window, 2));
+            Assert::IsTrue(data.SetAppLastZone(window, expectedZoneIndex));
+            Assert::AreEqual(expectedZoneIndex, data.GetAppLastZoneIndex(window));
+        }
+
+        TEST_METHOD(AppLastZoneInvalidWindow)
+        {
+            const auto window = Mocks::Window();
+            FancyZonesData data;
+
+            Assert::AreEqual(-1, data.GetAppLastZoneIndex(window));
+
+            const int expectedZoneIndex = 1;
+            Assert::IsFalse(data.SetAppLastZone(window, expectedZoneIndex));
+        }
+
+        TEST_METHOD(AppLastZoneNullWindow)
+        {
+            const auto window = nullptr;
+            FancyZonesData data;
+
+            const int expectedZoneIndex = 1;
+            Assert::IsFalse(data.SetAppLastZone(window, expectedZoneIndex));
+        }
+
+        TEST_METHOD(AppLastZoneRemoveWindow)
+        {
+            const auto window = Mocks::WindowCreate(m_hInst);
+            FancyZonesData data;
+
+            Assert::IsTrue(data.SetAppLastZone(window, 1));
+            Assert::IsTrue(data.RemoveAppLastZone(window));
+            Assert::AreEqual(-1, data.GetAppLastZoneIndex(window));
+        }
+
+        TEST_METHOD(AppLastZoneRemoveUnknownWindow)
+        {
+            const auto window = Mocks::WindowCreate(m_hInst);
+            FancyZonesData data;
+
+            Assert::IsTrue(data.RemoveAppLastZone(window));
+            Assert::AreEqual(-1, data.GetAppLastZoneIndex(window));
+        }
+
+        TEST_METHOD(AppLastZoneRemoveNullWindow)
+        {
+            const auto window = Mocks::WindowCreate(m_hInst);
+            FancyZonesData data;
+
+            Assert::IsFalse(data.RemoveAppLastZone(nullptr));
         }
     };
 }

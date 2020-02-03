@@ -181,7 +181,7 @@ namespace JSONHelpers
         return true;
     }
 
-    bool FancyZonesData::SetAppLastZone(HWND window, DWORD zoneIndex)
+    bool FancyZonesData::SetAppLastZone(HWND window, int zoneIndex)
     {
         auto processPath = get_process_path(window);
         if (processPath.empty())
@@ -189,7 +189,7 @@ namespace JSONHelpers
             return false;
         }
 
-        appZoneHistoryMap[processPath] = AppZoneHistoryData{ L"", static_cast<int>(zoneIndex) };
+        appZoneHistoryMap[processPath] = AppZoneHistoryData{ L"", zoneIndex };
         return true;
     }
 

@@ -199,7 +199,7 @@ namespace JSONHelpers
 
         int GetAppLastZoneIndex(HWND window) const;
         bool RemoveAppLastZone(HWND window);
-        bool SetAppLastZone(HWND window, DWORD zoneIndex); //TODO(stefan): Missing zone uuid (pass as arg)
+        bool SetAppLastZone(HWND window, int zoneIndex); //TODO(stefan): Missing zone uuid (pass as arg)
 
         void SetActiveZoneSet(const std::wstring& deviceId, const std::wstring& uuid);
 

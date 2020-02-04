@@ -3,6 +3,8 @@
 #include "RegistryHelpers.h"
 #include "ZoneSet.h"
 
+#include <common/common.h>
+
 #include <shlwapi.h>
 #include <filesystem>
 #include <fstream>
@@ -156,38 +158,39 @@ namespace JSONHelpers
         }
     }
 
-    int FancyZonesData::GetAppLastZone(HWND window, PCWSTR appPath) const
+    int FancyZonesData::GetAppLastZoneIndex(HWND window) const
     {
-        int iZoneIndex = -1;
-
-        if (auto monitor = MonitorFromWindow(window, MONITOR_DEFAULTTONULL))
+        auto processPath = get_process_path(window);
+        if (!processPath.empty() && appZoneHistoryMap.contains(processPath))
         {
-            std::wstring path{ appPath };
-            if (appZoneHistoryMap.contains(path))
-            {
-                iZoneIndex = appZoneHistoryMap.at(path).zoneIndex;
-            }
+            return appZoneHistoryMap.at(processPath).zoneIndex;
         }
-        return iZoneIndex;
+
+        return -1;
     }
 
-    // Pass -1 for the zoneIndex to delete the entry from the map
-    bool FancyZonesData::SetAppLastZone(HWND window, PCWSTR appPath, DWORD zoneIndex)
+    bool FancyZonesData::RemoveAppLastZone(HWND window)
     {
-        if (auto monitor = MonitorFromWindow(window, MONITOR_DEFAULTTONULL))
+        auto processPath = get_process_path(window);
+        if (processPath.empty())
         {
-            if (zoneIndex == -1)
-            {
-                appZoneHistoryMap.erase(std::wstring{ appPath });
-            }
-            else
-            {
-                //TODO(stefan) provide correct uuid in the future
-                appZoneHistoryMap[std::wstring{ appPath }] = AppZoneHistoryData{ L"", static_cast<int>(zoneIndex) };
-            }
-            return true;
+            return false;
         }
-        return false;
+
+        appZoneHistoryMap.erase(processPath);
+        return true;
+    }
+
+    bool FancyZonesData::SetAppLastZone(HWND window, DWORD zoneIndex)
+    {
+        auto processPath = get_process_path(window);
+        if (processPath.empty())
+        {
+            return false;
+        }
+
+        appZoneHistoryMap[processPath] = AppZoneHistoryData{ L"", static_cast<int>(zoneIndex) };
+        return true;
     }
 
     void FancyZonesData::SetActiveZoneSet(const std::wstring& deviceId, const std::wstring& uuid)

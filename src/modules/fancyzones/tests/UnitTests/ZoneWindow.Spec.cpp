@@ -8,8 +8,6 @@
 #include <lib/FancyZones.h>
 #include "Util.h"
 
-#include <common/common.h>
-
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace FancyZonesUnitTests
@@ -597,10 +595,9 @@ namespace FancyZonesUnitTests
             Assert::IsNotNull(m_zoneWindow->ActiveZoneSet());
 
             const auto window = Mocks::WindowCreate(m_hInst);
-            const auto processPath = get_process_path(window);
 
             //fill app zone history map
-            Assert::IsTrue(m_fancyZonesData.SetAppLastZone(window, processPath.c_str(), 0));
+            Assert::IsTrue(m_fancyZonesData.SetAppLastZone(window, 0));
             Assert::AreEqual((size_t)1, m_fancyZonesData.GetAppZoneHistoryMap().size());
             Assert::AreEqual(0, m_fancyZonesData.GetAppZoneHistoryMap().begin()->second.zoneIndex);
 
@@ -619,14 +616,13 @@ namespace FancyZonesUnitTests
             Assert::IsNotNull(m_zoneWindow->ActiveZoneSet());
 
             auto window = Mocks::WindowCreate(m_hInst);
-            const auto processPath = get_process_path(window);
 
             auto zone = MakeZone(RECT{ 0, 0, 100, 100 });
             zone->AddWindowToZone(window, Mocks::Window(), false);
             m_zoneWindow->ActiveZoneSet()->AddZone(zone);
 
             //fill app zone history map
-            Assert::IsTrue(m_fancyZonesData.SetAppLastZone(window, processPath.c_str(), 2));
+            Assert::IsTrue(m_fancyZonesData.SetAppLastZone(window, 2));
             Assert::AreEqual((size_t)1, m_fancyZonesData.GetAppZoneHistoryMap().size());
             Assert::AreEqual(2, m_fancyZonesData.GetAppZoneHistoryMap().begin()->second.zoneIndex);
 

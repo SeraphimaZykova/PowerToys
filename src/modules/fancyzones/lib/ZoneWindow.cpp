@@ -492,13 +492,12 @@ ZoneWindow::CycleActiveZoneSet(DWORD wparam) noexcept
 IFACEMETHODIMP_(void)
 ZoneWindow::SaveWindowProcessToZoneIndex(HWND window) noexcept
 {
-    auto processPath = get_process_path(window);
-    if (!processPath.empty() && m_activeZoneSet)
+    if (m_activeZoneSet)
     {
         DWORD zoneIndex = static_cast<DWORD>(m_activeZoneSet->GetZoneIndexFromWindow(window));
         if (zoneIndex != -1)
         {
-            JSONHelpers::FancyZonesDataInstance().SetAppLastZone(window, processPath.data(), zoneIndex);
+            JSONHelpers::FancyZonesDataInstance().SetAppLastZone(window, zoneIndex);
         }
     }
 }

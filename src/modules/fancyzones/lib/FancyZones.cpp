@@ -271,16 +271,12 @@ IFACEMETHODIMP_(void) FancyZones::WindowCreated(HWND window) noexcept
 {
     if (m_settings->GetSettings().appLastZone_moveWindows)
     {
-        auto processPath = get_process_path(window);
-        if (!processPath.empty())
-        {
-            const auto& fancyZonesData = JSONHelpers::FancyZonesDataInstance();
-            int zoneIndex = fancyZonesData.GetAppLastZone(window, processPath.data());
+        const auto& fancyZonesData = JSONHelpers::FancyZonesDataInstance();
+        int zoneIndex = fancyZonesData.GetAppLastZoneIndex(window);
 
-            if (zoneIndex != -1)
-            {
-                MoveWindowIntoZoneByIndex(window, zoneIndex);
-            }
+        if (zoneIndex != -1)
+        {
+            MoveWindowIntoZoneByIndex(window, zoneIndex);
         }
     }
 }
@@ -818,12 +814,7 @@ void FancyZones::MoveSizeEndInternal(HWND window, POINT const& ptScreen, require
     else
     {
         ::RemoveProp(window, ZONE_STAMP);
-
-        auto processPath = get_process_path(window);
-        if (!processPath.empty())
-        {
-            JSONHelpers::FancyZonesDataInstance().SetAppLastZone(window, processPath.data(), -1);
-        }
+        JSONHelpers::FancyZonesDataInstance().RemoveAppLastZone(window);
     }
 }
 

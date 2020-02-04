@@ -197,8 +197,9 @@ namespace JSONHelpers
 
         void AddDevice(const std::wstring& deviceId);
 
-        int GetAppLastZone(HWND window, PCWSTR appPath) const;
-        bool SetAppLastZone(HWND window, PCWSTR appPath, DWORD zoneIndex); //TODO(stefan): Missing zone uuid (pass as arg)
+        int GetAppLastZoneIndex(HWND window) const;
+        bool RemoveAppLastZone(HWND window);
+        bool SetAppLastZone(HWND window, DWORD zoneIndex); //TODO(stefan): Missing zone uuid (pass as arg)
 
         void SetActiveZoneSet(const std::wstring& deviceId, const std::wstring& uuid);
 

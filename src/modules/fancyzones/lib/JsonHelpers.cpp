@@ -158,7 +158,7 @@ namespace JSONHelpers
         }
     }
 
-    int FancyZonesData::GetAppLastZoneIndex(HWND window, const std::wstring_view& deviceId, const GUID& zoneSetId) const
+    int FancyZonesData::GetAppLastZoneIndex(HWND window, const std::wstring_view& deviceId, const std::wstring_view& zoneSetId) const
     {
         auto processPath = get_process_path(window);
         if (!processPath.empty())
@@ -177,7 +177,7 @@ namespace JSONHelpers
         return -1;
     }
 
-    bool FancyZonesData::RemoveAppLastZone(HWND window, const std::wstring_view& deviceId, const GUID& zoneSetId)
+    bool FancyZonesData::RemoveAppLastZone(HWND window, const std::wstring_view& deviceId, const std::wstring_view& zoneSetId)
     {
         auto processPath = get_process_path(window);
         if (!processPath.empty())
@@ -197,7 +197,7 @@ namespace JSONHelpers
         return false;
     }
 
-    bool FancyZonesData::SetAppLastZone(HWND window, const std::wstring& deviceId, const GUID& zoneSetId, int zoneIndex)
+    bool FancyZonesData::SetAppLastZone(HWND window, const std::wstring& deviceId, const std::wstring& zoneSetId, int zoneIndex)
     {
         auto processPath = get_process_path(window);
         if (processPath.empty())
@@ -205,7 +205,7 @@ namespace JSONHelpers
             return false;
         }
 
-        appZoneHistoryMap[processPath] = AppZoneHistoryData{ zoneSetId, deviceId, zoneIndex };
+        appZoneHistoryMap[processPath] = AppZoneHistoryData{ .zoneSetUuid = zoneSetId, .deviceId = deviceId, .zoneIndex = zoneIndex };
         return true;
     }
 
@@ -524,7 +524,7 @@ namespace JSONHelpers
                 DWORD i = 0;
                 while (RegEnumValueW(hkey, i++, value, &valueLength, nullptr, nullptr, reinterpret_cast<BYTE*>(&zoneIndex), &dataSize) == ERROR_SUCCESS)
                 {
-                    appZoneHistoryMap[std::wstring{ value }] = AppZoneHistoryData{ GUID{}, L"", static_cast<int>(zoneIndex) }; //TODO(stefan) provide correct uuid in the future
+                    appZoneHistoryMap[std::wstring{ value }] = AppZoneHistoryData{ .zoneSetUuid = L"", .deviceId = L"", .zoneIndex = static_cast<int>(zoneIndex) }; //TODO(stefan) provide correct uuid in the future
 
                     valueLength = ARRAYSIZE(value);
                     dataSize = sizeof(zoneIndex);
@@ -693,13 +693,7 @@ namespace JSONHelpers
         result.SetNamedValue(L"app-path", json::value(appZoneHistory.appPath));
         result.SetNamedValue(L"zone-index", json::value(appZoneHistory.data.zoneIndex));
         result.SetNamedValue(L"device-id", json::value(appZoneHistory.data.deviceId));
-
-        OLECHAR* guidString;
-        if (StringFromCLSID(appZoneHistory.data.zoneSetUuid, &guidString) == S_OK)
-        {
-            result.SetNamedValue(L"zoneset-uuid", json::value(guidString));
-        }
-        CoTaskMemFree(guidString);
+        result.SetNamedValue(L"zoneset-uuid", json::value(appZoneHistory.data.zoneSetUuid));
 
         return result;
     }
@@ -713,12 +707,7 @@ namespace JSONHelpers
             result.appPath = zoneSet.GetNamedString(L"app-path");
             result.data.zoneIndex = static_cast<int>(zoneSet.GetNamedNumber(L"zone-index"));
             result.data.deviceId = zoneSet.GetNamedString(L"device-id");
-
-            auto guidString = zoneSet.GetNamedString(L"zoneset-uuid");
-            if (CLSIDFromString(guidString.c_str(), &result.data.zoneSetUuid) != S_OK)
-            {
-                return std::nullopt;
-            }
+            result.data.zoneSetUuid = zoneSet.GetNamedString(L"zoneset-uuid");
 
             return result;
         }

@@ -278,11 +278,17 @@ IFACEMETHODIMP_(void) FancyZones::WindowCreated(HWND window) noexcept
             if (zoneWindow != m_zoneWindowMap.end())
             {
                 const auto& fancyZonesData = JSONHelpers::FancyZonesDataInstance();
-                int zoneIndex = fancyZonesData.GetAppLastZoneIndex(window, zoneWindow->second->UniqueId(), zoneWindow->second->ActiveZoneSet()->Id());
+
+                OLECHAR* guidString;
+                StringFromCLSID(zoneWindow->second->ActiveZoneSet()->Id(), &guidString);
+
+                int zoneIndex = fancyZonesData.GetAppLastZoneIndex(window, zoneWindow->second->UniqueId(), guidString);
                 if (zoneIndex != -1)
                 {
                     MoveWindowIntoZoneByIndex(window, zoneIndex);
                 }
+
+                CoTaskMemFree(guidString);
             }
         }                
     }
@@ -828,7 +834,11 @@ void FancyZones::MoveSizeEndInternal(HWND window, POINT const& ptScreen, require
             auto zoneWindow = m_zoneWindowMap.find(monitor);
             if (zoneWindow != m_zoneWindowMap.end())
             {
-                JSONHelpers::FancyZonesDataInstance().RemoveAppLastZone(window, zoneWindow->second->UniqueId(), zoneWindow->second->ActiveZoneSet()->Id());            
+                OLECHAR* guidString;
+                StringFromCLSID(zoneWindow->second->ActiveZoneSet()->Id(), &guidString);
+
+                JSONHelpers::FancyZonesDataInstance().RemoveAppLastZone(window, zoneWindow->second->UniqueId(), guidString);
+                CoTaskMemFree(guidString);
             }            
         }
     }

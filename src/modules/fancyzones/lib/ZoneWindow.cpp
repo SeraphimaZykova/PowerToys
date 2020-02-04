@@ -489,8 +489,7 @@ ZoneWindow::CycleActiveZoneSet(DWORD wparam) noexcept
     }
 }
 
-IFACEMETHODIMP_(void)
-ZoneWindow::SaveWindowProcessToZoneIndex(HWND window) noexcept
+IFACEMETHODIMP_(void) ZoneWindow::SaveWindowProcessToZoneIndex(HWND window) noexcept
 {
     if (m_activeZoneSet)
     {

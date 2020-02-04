@@ -158,30 +158,46 @@ namespace JSONHelpers
         }
     }
 
-    int FancyZonesData::GetAppLastZoneIndex(HWND window) const
+    int FancyZonesData::GetAppLastZoneIndex(HWND window, const std::wstring_view& zoneWindowId, const GUID& zoneSetId) const
     {
         auto processPath = get_process_path(window);
-        if (!processPath.empty() && appZoneHistoryMap.contains(processPath))
+        if (!processPath.empty())
         {
-            return appZoneHistoryMap.at(processPath).zoneIndex;
+            auto history = appZoneHistoryMap.find(processPath);
+            if (history != appZoneHistoryMap.end())
+            {
+                const auto& data = history->second;
+                if (data.zoneSetUuid == zoneSetId && data.zoneWindowUuid == zoneWindowId)
+                {
+                    return history->second.zoneIndex;
+                }                
+            }
         }
 
         return -1;
     }
 
-    bool FancyZonesData::RemoveAppLastZone(HWND window)
+    bool FancyZonesData::RemoveAppLastZone(HWND window, const std::wstring& zoneWindowId, const GUID& zoneSetId)
     {
         auto processPath = get_process_path(window);
-        if (processPath.empty())
+        if (!processPath.empty())
         {
-            return false;
-        }
-
-        appZoneHistoryMap.erase(processPath);
-        return true;
+            auto history = appZoneHistoryMap.find(processPath);
+            if (history != appZoneHistoryMap.end())
+            {
+                const auto& data = history->second;
+                if (data.zoneSetUuid == zoneSetId && data.zoneWindowUuid == zoneWindowId)
+                {
+                    appZoneHistoryMap.erase(processPath);
+                    return true;
+                }
+            }
+        }      
+                
+        return false;
     }
 
-    bool FancyZonesData::SetAppLastZone(HWND window, int zoneIndex)
+    bool FancyZonesData::SetAppLastZone(HWND window, const std::wstring& zoneWindowId, const GUID& zoneSetId, int zoneIndex)
     {
         auto processPath = get_process_path(window);
         if (processPath.empty())
@@ -189,7 +205,7 @@ namespace JSONHelpers
             return false;
         }
 
-        appZoneHistoryMap[processPath] = AppZoneHistoryData{ L"", zoneIndex };
+        appZoneHistoryMap[processPath] = AppZoneHistoryData{ zoneSetId, zoneWindowId, zoneIndex };
         return true;
     }
 
@@ -294,7 +310,7 @@ namespace JSONHelpers
                 else
                 {
                     return false;
-                }
+                }                
             }
 
             return true;
@@ -508,7 +524,7 @@ namespace JSONHelpers
                 DWORD i = 0;
                 while (RegEnumValueW(hkey, i++, value, &valueLength, nullptr, nullptr, reinterpret_cast<BYTE*>(&zoneIndex), &dataSize) == ERROR_SUCCESS)
                 {
-                    appZoneHistoryMap[std::wstring{ value }] = AppZoneHistoryData{ L"", static_cast<int>(zoneIndex) }; //TODO(stefan) provide correct uuid in the future
+                    appZoneHistoryMap[std::wstring{ value }] = AppZoneHistoryData{ GUID{}, L"", static_cast<int>(zoneIndex) }; //TODO(stefan) provide correct uuid in the future
 
                     valueLength = ARRAYSIZE(value);
                     dataSize = sizeof(zoneIndex);
@@ -675,8 +691,15 @@ namespace JSONHelpers
         json::JsonObject result{};
 
         result.SetNamedValue(L"app-path", json::value(appZoneHistory.appPath));
-        result.SetNamedValue(L"zoneset-uuid", json::value(appZoneHistory.data.zoneSetUuid));
         result.SetNamedValue(L"zone-index", json::value(appZoneHistory.data.zoneIndex));
+        result.SetNamedValue(L"zone-window-uuid", json::value(appZoneHistory.data.zoneWindowUuid));
+
+        OLECHAR* guidString;
+        if (StringFromCLSID(appZoneHistory.data.zoneSetUuid, &guidString) == S_OK)
+        {
+            result.SetNamedValue(L"zoneset-uuid", json::value(guidString));
+        }
+        CoTaskMemFree(guidString);
 
         return result;
     }
@@ -688,8 +711,14 @@ namespace JSONHelpers
             AppZoneHistoryJSON result;
 
             result.appPath = zoneSet.GetNamedString(L"app-path");
-            result.data.zoneSetUuid = zoneSet.GetNamedString(L"zoneset-uuid");
             result.data.zoneIndex = static_cast<int>(zoneSet.GetNamedNumber(L"zone-index"));
+            result.data.zoneWindowUuid = zoneSet.GetNamedString(L"zone-window-uuid");
+
+            auto guidString = zoneSet.GetNamedString(L"zoneset-uuid");
+            if (CLSIDFromString(guidString.c_str(), &result.data.zoneSetUuid) != S_OK)
+            {
+                return std::nullopt;
+            }
 
             return result;
         }

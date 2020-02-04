@@ -497,7 +497,7 @@ ZoneWindow::SaveWindowProcessToZoneIndex(HWND window) noexcept
         DWORD zoneIndex = static_cast<DWORD>(m_activeZoneSet->GetZoneIndexFromWindow(window));
         if (zoneIndex != -1)
         {
-            JSONHelpers::FancyZonesDataInstance().SetAppLastZone(window, zoneIndex);
+            JSONHelpers::FancyZonesDataInstance().SetAppLastZone(window, m_uniqueId, m_activeZoneSet->Id(), zoneIndex);
         }
     }
 }

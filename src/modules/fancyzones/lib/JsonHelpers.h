@@ -127,7 +127,7 @@ namespace JSONHelpers
     struct AppZoneHistoryData
     {
         GUID zoneSetUuid;
-        std::wstring zoneWindowUuid;
+        std::wstring deviceId;
         int zoneIndex;
     };
 
@@ -197,9 +197,9 @@ namespace JSONHelpers
 
         void AddDevice(const std::wstring& deviceId);
 
-        int GetAppLastZoneIndex(HWND window, const std::wstring_view& zoneWindowId, const GUID& zoneSetId) const;
-        bool RemoveAppLastZone(HWND window, const std::wstring& zoneWindowId, const GUID& zoneSetId);
-        bool SetAppLastZone(HWND window, const std::wstring& zoneWindowId, const GUID& zoneSetId, int zoneIndex);
+        int GetAppLastZoneIndex(HWND window, const std::wstring_view& deviceId, const GUID& zoneSetId) const;
+        bool RemoveAppLastZone(HWND window, const std::wstring_view& deviceId, const GUID& zoneSetId);
+        bool SetAppLastZone(HWND window, const std::wstring& deviceId, const GUID& zoneSetId, int zoneIndex);
 
         void SetActiveZoneSet(const std::wstring& deviceId, const std::wstring& uuid);
 

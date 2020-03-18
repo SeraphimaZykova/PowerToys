@@ -87,7 +87,7 @@ namespace PowerToysTests
             }
         }
 
-        public static void WaitSeconds(int seconds)
+        public static void WaitSeconds(double seconds)
         {
             Thread.Sleep(TimeSpan.FromSeconds(seconds));
         }

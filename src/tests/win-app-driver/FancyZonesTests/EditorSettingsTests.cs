@@ -2,6 +2,8 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium.Appium.Windows;
+using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace PowerToysTests
 {
@@ -11,48 +13,58 @@ namespace PowerToysTests
         [TestMethod]
         public void ZoneCount()
         {
-
-            WaitSeconds(1);
-
+            ShortWait();
             OpenFancyZonesSettings();
 
-            WaitSeconds(1);
-
-            WindowsElement editorButton = session.FindElementByXPath("//Button[@Name=\"Edit zones\"]");
-            Assert.IsNotNull(editorButton);
+            WindowsElement editorButton = WaitElementByXPath("//Button[@Name=\"Edit zones\"]");
             editorButton.Click();
-
-            WaitSeconds(1);
-
-            WindowsElement minusButton = session.FindElementByAccessibilityId("decrementZones");
-            Assert.IsNotNull(minusButton);
-
-            WindowsElement plusButton = session.FindElementByAccessibilityId("incrementZones");
-            Assert.IsNotNull(plusButton);
-
-            WindowsElement zoneCount = session.FindElementByAccessibilityId("zoneCount");
-            Assert.IsNotNull(zoneCount);
+            
+            WindowsElement minusButton = WaitElementByAccessibilityId("decrementZones");
+            WindowsElement zoneCount = WaitElementByAccessibilityId("zoneCount");
+            WindowsElement applyButton;
 
             int zoneCountQty;
             Assert.IsTrue(Int32.TryParse(zoneCount.Text, out zoneCountQty));
 
-            for (int i = zoneCountQty; i > -5; --i)
+            for (int i = zoneCountQty - 1, j = 0; i > -5; --i, ++j)
             {
+                minusButton.Click();
+
                 Assert.IsTrue(Int32.TryParse(zoneCount.Text, out zoneCountQty));
                 Assert.AreEqual(Math.Max(i, 1), zoneCountQty);
-                minusButton.Click();
+
+                if (j == 0 || i == -4) {
+                    applyButton = WaitElementByAccessibilityId("ApplyTemplateButton");
+                    applyButton.Click();
+                    ShortWait();
+                    Assert.AreEqual(zoneCountQty, getSavedZoneCount());
+                    editorButton.Click();
+                    minusButton = WaitElementByAccessibilityId("decrementZones");
+                    zoneCount = WaitElementByAccessibilityId("zoneCount");
+                }
             }
 
-            for (int i = 1; i < 45; ++i)
+            WindowsElement plusButton = WaitElementByAccessibilityId("incrementZones");
+
+            for (int i = 2; i < 45; ++i)
             {
+                plusButton.Click();
+
                 Assert.IsTrue(Int32.TryParse(zoneCount.Text, out zoneCountQty));
                 Assert.AreEqual(Math.Min(i, 40), zoneCountQty);
-                plusButton.Click();
             }
 
-            WindowsElement mainWindow = session.FindElementByAccessibilityId("MainWindow1");
-            Assert.IsNotNull(mainWindow);
-            mainWindow.SendKeys(Keys.Alt + Keys.F4);
+            applyButton = WaitElementByAccessibilityId("ApplyTemplateButton");
+            applyButton.Click();
+            ShortWait();
+            Assert.AreEqual(zoneCountQty, getSavedZoneCount());
+        }
+
+        private int getSavedZoneCount()
+        {
+            JObject zoneSettings = JObject.Parse(File.ReadAllText(_zoneSettingsPath));
+            int editorZoneCount = (int)zoneSettings["devices"][0]["editor-zone-count"];
+            return editorZoneCount;
         }
 
         [ClassInitialize]

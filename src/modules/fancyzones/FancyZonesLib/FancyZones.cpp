@@ -391,7 +391,7 @@ void FancyZones::WindowCreated(HWND window) noexcept
     }
 
     auto desktopId = m_virtualDesktop.GetDesktopId(window);
-    if (desktopId.has_value() && *desktopId != m_currentDesktopId)
+    if (!desktopId.has_value() || (desktopId.has_value() && *desktopId != m_currentDesktopId))
     {
         // Switch between virtual desktops results with posting same windows messages that also indicate
         // creation of new window. We need to check if window being processed is on currently active desktop.

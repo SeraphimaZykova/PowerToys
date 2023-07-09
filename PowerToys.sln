@@ -525,6 +525,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FilePreviewCommon", "src\co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.PowerToys.Run.Plugin.PowerToys", "src\modules\launcher\Plugins\Microsoft.PowerToys.Run.Plugin.PowerToys\Microsoft.PowerToys.Run.Plugin.PowerToys.csproj", "{500DED3E-CFB5-4ED5-ACC6-02B3D6DC336D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FancyZonesHookDll", "src\modules\fancyzones\FancyZonesHookDll\FancyZonesHookDll.vcxproj", "{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -2247,6 +2249,18 @@ Global
 		{500DED3E-CFB5-4ED5-ACC6-02B3D6DC336D}.Release|x64.Build.0 = Release|x64
 		{500DED3E-CFB5-4ED5-ACC6-02B3D6DC336D}.Release|x86.ActiveCfg = Release|x64
 		{500DED3E-CFB5-4ED5-ACC6-02B3D6DC336D}.Release|x86.Build.0 = Release|x64
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Debug|ARM64.ActiveCfg = Debug|x64
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Debug|ARM64.Build.0 = Debug|x64
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Debug|x64.ActiveCfg = Debug|x64
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Debug|x64.Build.0 = Debug|x64
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Debug|x86.ActiveCfg = Debug|Win32
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Debug|x86.Build.0 = Debug|Win32
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Release|ARM64.ActiveCfg = Release|x64
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Release|ARM64.Build.0 = Release|x64
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Release|x64.ActiveCfg = Release|x64
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Release|x64.Build.0 = Release|x64
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Release|x86.ActiveCfg = Release|Win32
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2436,6 +2450,7 @@ Global
 		{929C1324-22E8-4412-A9A8-80E85F3985A5} = {4574FDD0-F61D-4376-98BF-E5A1262C11EC}
 		{9EBAA524-0EDA-470B-95D4-39383285CBB2} = {1AFB6476-670D-4E80-A464-657E01DFF482}
 		{500DED3E-CFB5-4ED5-ACC6-02B3D6DC336D} = {4AFC9975-2456-4C70-94A4-84073C1CED93}
+		{2ADA1BC1-DC29-40A0-85F7-3935B4C9926F} = {D1D6BC88-09AE-4FB4-AD24-5DED46A791DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C3A2F9D1-7930-4EF4-A6FC-7EE0A99821D0}

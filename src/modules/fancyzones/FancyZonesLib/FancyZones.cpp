@@ -29,6 +29,10 @@
 #include <FancyZonesLib/WindowDrag.h>
 #include <FancyZonesLib/WorkArea.h>
 
+
+
+#include <FancyZonesLib/FZWindow.h>
+
 enum class DisplayChangeType
 {
     WorkArea,
@@ -170,6 +174,10 @@ private:
     std::unique_ptr<WindowDrag> m_windowDrag{};
     MonitorWorkAreaMap m_workAreaHandler;
     DraggingState m_draggingState;
+
+
+    FZWindow m_fzWindowHook;
+
 
     wil::unique_handle m_terminateEditorEvent; // Handle of FancyZonesEditor.exe we launch and wait on
 

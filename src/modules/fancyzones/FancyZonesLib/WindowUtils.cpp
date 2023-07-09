@@ -574,3 +574,17 @@ bool FancyZonesWindowUtils::IsCursorTypeIndicatingSizeEvent()
     }
     return false;
 }
+
+void FancyZonesWindowUtils::LogName(HWND window)
+{
+    DWORD cTxtLen = GetWindowTextLength(window);
+    auto pszMem = static_cast<LPWSTR>(VirtualAlloc(NULL, static_cast<SIZE_T>(cTxtLen) + 1, MEM_COMMIT, PAGE_READWRITE));
+    GetWindowText(window, pszMem, cTxtLen + 1);
+
+    wchar_t className[MAX_PATH];
+    GetClassName(window, className, MAX_PATH);
+
+    std::wstring processPath = get_process_path_waiting_uwp(window);
+
+    Logger::debug(L"text: {}, class: {}, path: {}", pszMem, className, processPath);
+}

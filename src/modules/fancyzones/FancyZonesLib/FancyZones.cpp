@@ -129,6 +129,8 @@ public:
     void MoveSizeUpdate(HMONITOR monitor, POINT const& ptScreen);
     void MoveSizeEnd();
 
+    void RestoreWindowSize(HWND window, HMONITOR monitor);
+
     void WindowCreated(HWND window) noexcept;
     void ToggleEditor() noexcept;
 
@@ -328,6 +330,30 @@ void FancyZones::MoveSizeUpdate(HMONITOR monitor, POINT const& ptScreen)
         m_draggingState.UpdateDraggingState();
         m_windowDrag->MoveSizeUpdate(monitor, ptScreen, m_draggingState.IsDragging(), m_draggingState.IsSelectManyZonesState());
     }
+}
+
+void FancyZones::RestoreWindowSize(HWND window, HMONITOR monitor)
+{
+    if (window == m_window)
+    {
+        return;
+    }
+
+    const auto& activeWorkAreas = m_workAreaHandler.GetAllWorkAreas();
+    auto iter = activeWorkAreas.find(monitor);
+    if (iter == end(activeWorkAreas))
+    {
+        return;
+    }
+
+    auto indexes = iter->second->GetWindowZoneIndexes(window);
+    // auto indexes = FancyZonesWindowProperties::RetrieveZoneIndexProperty(window);
+    if (indexes.empty())
+    {
+        return;
+    }
+
+    iter->second->MoveWindowIntoZoneByIndexSet(window, indexes);
 }
 
 void FancyZones::MoveSizeEnd()
@@ -649,9 +675,19 @@ LRESULT FancyZones::WndProc(HWND window, UINT message, WPARAM wparam, LPARAM lpa
         }
         else if (message == WM_PRIV_LOCATIONCHANGE)
         {
-            if (auto monitor = MonitorFromPoint(ptScreen, MONITOR_DEFAULTTONULL))
+            auto hwnd = reinterpret_cast<HWND>(wparam);
+            // FancyZonesWindowUtils::LogName(hwnd);
+            if (auto monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONULL))
             {
-                MoveSizeUpdate(monitor, ptScreen);
+                if (m_windowDrag)
+                {
+                    GetPhysicalCursorPos(&ptScreen);
+                    MoveSizeUpdate(monitor, ptScreen);
+                }
+                else
+                {
+                    RestoreWindowSize(hwnd, monitor);
+                }
             }
         }
         else if (message == WM_PRIV_WINDOWCREATED)

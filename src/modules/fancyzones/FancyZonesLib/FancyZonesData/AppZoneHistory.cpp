@@ -347,7 +347,7 @@ bool AppZoneHistory::SetAppLastZones(HWND window, const FancyZonesDataTypes::Wor
         return false;
     }
 
-    Logger::info(L"Add app zone history, device: {}, layout: {}", workAreaId.toString(), zoneSetId);
+    //Logger::info(L"Add app zone history, device: {}, layout: {}", workAreaId.toString(), zoneSetId);
 
     DWORD processId = 0;
     GetWindowThreadProcessId(window, &processId);
@@ -537,7 +537,7 @@ ZoneIndexSet AppZoneHistory::GetAppLastZoneIndexSet(HWND window, const FancyZone
     auto processPath = get_process_path_waiting_uwp(window);
     if (processPath.empty())
     {
-        Logger::error("Process path is empty");
+        //Logger::error("Process path is empty");
         return {};
     }
 
@@ -548,7 +548,7 @@ ZoneIndexSet AppZoneHistory::GetAppLastZoneIndexSet(HWND window, const FancyZone
         app = processPath.substr(pos + 1);
     }
 
-    Logger::info(L"Get {} zone history on work area: {}", app, workAreaId.toString());
+    //Logger::info(L"Get {} zone history on work area: {}", app, workAreaId.toString());
 
     auto history = m_history.find(processPath);
     if (history == std::end(m_history))
@@ -563,7 +563,7 @@ ZoneIndexSet AppZoneHistory::GetAppLastZoneIndexSet(HWND window, const FancyZone
         {
             if (data.workAreaId.virtualDesktopId == workAreaId.virtualDesktopId || data.workAreaId.virtualDesktopId == GUID_NULL)
             {
-                Logger::info(L"App zone history found on the work area {}", data.workAreaId.toString());
+                //Logger::info(L"App zone history found on the work area {}", data.workAreaId.toString());
                 return data.zoneIndexSet;
             }
         }

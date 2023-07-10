@@ -17,7 +17,6 @@ private:
     static inline HHOOK s_llKeyboardHook = nullptr;
     
     winrt::com_ptr<IFancyZones> m_app;
-    HWINEVENTHOOK m_objectLocationWinEventHook = nullptr;
     std::vector<HWINEVENTHOOK> m_staticWinEventHooks;
 
     void DisableModule() noexcept;

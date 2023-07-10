@@ -103,7 +103,10 @@ public:
             PostMessageW(m_window, WM_PRIV_MOVESIZEEND, wparam, lparam);
             break;
         case EVENT_OBJECT_LOCATIONCHANGE:
-            PostMessageW(m_window, WM_PRIV_LOCATIONCHANGE, wparam, lparam);
+            if (data->idObject == OBJID_WINDOW)
+            {
+                PostMessageW(m_window, WM_PRIV_LOCATIONCHANGE, wparam, lparam);
+            }
             break;
         case EVENT_OBJECT_NAMECHANGE:
             PostMessageW(m_window, WM_PRIV_NAMECHANGE, wparam, lparam);

@@ -46,13 +46,6 @@ FancyZonesApp::~FancyZonesApp()
                                                        return UnhookWinEvent(hook);
                                                    }),
                                     end(m_staticWinEventHooks));
-        if (m_objectLocationWinEventHook)
-        {
-            if (UnhookWinEvent(m_objectLocationWinEventHook))
-            {
-                m_objectLocationWinEventHook = nullptr;
-            }
-        }
     }
 }
 
@@ -84,9 +77,10 @@ void FancyZonesApp::InitHooks()
         }
     }
 
-    std::array<DWORD, 6> events_to_subscribe = {
+    std::array<DWORD, 7> events_to_subscribe = {
         EVENT_SYSTEM_MOVESIZESTART,
         EVENT_SYSTEM_MOVESIZEEND,
+        EVENT_OBJECT_LOCATIONCHANGE,
         EVENT_OBJECT_NAMECHANGE,
         EVENT_OBJECT_UNCLOAKED,
         EVENT_OBJECT_SHOW,
@@ -122,25 +116,11 @@ void FancyZonesApp::HandleWinHookEvent(WinHookEvent* data) noexcept
     case EVENT_SYSTEM_MOVESIZESTART:
     {
         fzCallback->HandleWinHookEvent(data);
-        if (!m_objectLocationWinEventHook)
-        {
-            m_objectLocationWinEventHook = SetWinEventHook(EVENT_OBJECT_LOCATIONCHANGE,
-                                                           EVENT_OBJECT_LOCATIONCHANGE,
-                                                           nullptr,
-                                                           WinHookProc,
-                                                           0,
-                                                           0,
-                                                           WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
-        }
     }
     break;
 
     case EVENT_SYSTEM_MOVESIZEEND:
     {
-        if (UnhookWinEvent(m_objectLocationWinEventHook))
-        {
-            m_objectLocationWinEventHook = nullptr;
-        }
         fzCallback->HandleWinHookEvent(data);
     }
     break;

@@ -132,7 +132,7 @@ public:
     void MoveSizeUpdate(HMONITOR monitor, POINT const& ptScreen);
     void MoveSizeEnd();
 
-    void RestoreWindowSize(HWND window, HMONITOR monitor);
+    void RestoreMaximizedWindowSize(HWND window, HMONITOR monitor); // Returns zoned window back to the zone when maximized
 
     void WindowCreated(HWND window) noexcept;
     void ToggleEditor() noexcept;
@@ -335,30 +335,6 @@ void FancyZones::MoveSizeUpdate(HMONITOR monitor, POINT const& ptScreen)
     }
 }
 
-void FancyZones::RestoreWindowSize(HWND window, HMONITOR monitor)
-{
-    if (window == m_window)
-    {
-        return;
-    }
-
-    const auto& activeWorkAreas = m_workAreaHandler.GetAllWorkAreas();
-    auto iter = activeWorkAreas.find(monitor);
-    if (iter == end(activeWorkAreas))
-    {
-        return;
-    }
-
-    auto indexes = iter->second->GetWindowZoneIndexes(window);
-    // auto indexes = FancyZonesWindowProperties::RetrieveZoneIndexProperty(window);
-    if (indexes.empty())
-    {
-        return;
-    }
-
-    iter->second->MoveWindowIntoZoneByIndexSet(window, indexes);
-}
-
 void FancyZones::MoveSizeEnd()
 {
     if (m_windowDrag)
@@ -367,6 +343,37 @@ void FancyZones::MoveSizeEnd()
         m_draggingState.Disable();
         m_windowDrag = nullptr;
     }
+}
+
+void FancyZones::RestoreMaximizedWindowSize(HWND window, HMONITOR monitor)
+{
+    if (!FancyZonesSettings::settings().allowMaximizedAndFullscreenToZone)
+    {
+        return;
+    }
+
+    auto indexes = FancyZonesWindowProperties::RetrieveZoneIndexProperty(window);
+    if (indexes.empty())
+    {
+        // window wasn't snapped
+        return;
+    }
+
+    if (!FancyZonesWindowUtils::IsWindowMaximized(window))
+    {
+        // check if window maximized to avoid side-effects, e.g. when it's resized
+        return;
+    }
+
+    const auto& activeWorkAreas = m_workAreaHandler.GetAllWorkAreas();
+    auto iter = activeWorkAreas.find(monitor);
+    if (iter == end(activeWorkAreas))
+    {
+        Logger::error("RestoreMaximizedWindowSize: work area not found");
+        return;
+    }
+
+    iter->second->MoveWindowIntoZoneByIndexSet(window, indexes);
 }
 
 bool FancyZones::MoveToAppLastZone(HWND window, HMONITOR monitor) noexcept
@@ -642,9 +649,6 @@ LRESULT FancyZones::WndProc(HWND window, UINT message, WPARAM wparam, LPARAM lpa
 
     default:
     {
-        POINT ptScreen;
-        GetPhysicalCursorPos(&ptScreen);
-
         if (message == WM_PRIV_SNAP_HOTKEY)
         {
             OnSnapHotkey(static_cast<DWORD>(lparam));
@@ -667,6 +671,9 @@ LRESULT FancyZones::WndProc(HWND window, UINT message, WPARAM wparam, LPARAM lpa
         else if (message == WM_PRIV_MOVESIZESTART)
         {
             auto hwnd = reinterpret_cast<HWND>(wparam);
+            POINT ptScreen;
+            GetPhysicalCursorPos(&ptScreen);
+
             if (auto monitor = MonitorFromPoint(ptScreen, MONITOR_DEFAULTTONULL))
             {
                 MoveSizeStart(hwnd, monitor);
@@ -679,17 +686,17 @@ LRESULT FancyZones::WndProc(HWND window, UINT message, WPARAM wparam, LPARAM lpa
         else if (message == WM_PRIV_LOCATIONCHANGE)
         {
             auto hwnd = reinterpret_cast<HWND>(wparam);
-            // FancyZonesWindowUtils::LogName(hwnd);
             if (auto monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONULL))
             {
                 if (m_windowDrag)
                 {
+                    POINT ptScreen;
                     GetPhysicalCursorPos(&ptScreen);
                     MoveSizeUpdate(monitor, ptScreen);
                 }
                 else
                 {
-                    RestoreWindowSize(hwnd, monitor);
+                    RestoreMaximizedWindowSize(hwnd, monitor);
                 }
             }
         }

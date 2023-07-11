@@ -132,7 +132,7 @@ public:
     void MoveSizeUpdate(HMONITOR monitor, POINT const& ptScreen);
     void MoveSizeEnd();
 
-    void RestoreMaximizedWindowSize(HWND window, HMONITOR monitor); // Returns zoned window back to the zone when maximized
+    void MaximizeToZone(HWND window, HMONITOR monitor, POINT const& ptScreen);
 
     void WindowCreated(HWND window) noexcept;
     void ToggleEditor() noexcept;
@@ -345,23 +345,33 @@ void FancyZones::MoveSizeEnd()
     }
 }
 
-void FancyZones::RestoreMaximizedWindowSize(HWND window, HMONITOR monitor)
+void FancyZones::MaximizeToZone(HWND window, HMONITOR monitor, POINT const& ptScreen)
 {
     if (!FancyZonesSettings::settings().maximizeToZone)
     {
         return;
     }
 
-    auto indexes = FancyZonesWindowProperties::RetrieveZoneIndexProperty(window);
-    if (indexes.empty())
+    if (!IsMaximized(window))
     {
-        // window wasn't snapped
+        return;
+    }
+    
+    auto indexes = FancyZonesWindowProperties::RetrieveZoneIndexProperty(window);
+    if (!indexes.empty())
+    {
+        // window is already zoned
         return;
     }
 
-    if (!FancyZonesWindowUtils::IsMaximized(window))
+    if (!FancyZonesWindowUtils::IsCandidateForZoning(window))
     {
-        // check if window maximized to avoid side-effects, e.g. when it's resized
+        return;
+    }
+
+    if (!FancyZonesWindowProcessing::IsProcessable(window))
+    {
+        // not allowed to be zoned
         return;
     }
 
@@ -369,11 +379,20 @@ void FancyZones::RestoreMaximizedWindowSize(HWND window, HMONITOR monitor)
     auto iter = activeWorkAreas.find(monitor);
     if (iter == end(activeWorkAreas))
     {
-        Logger::error("RestoreMaximizedWindowSize: work area not found");
+        Logger::error("MaximizeToZone: work area not found");
         return;
     }
 
-    iter->second->MoveWindowIntoZoneByIndexSet(window, indexes);
+    const auto& workArea = iter->second;
+    const auto& layout = workArea->GetLayout();
+    if (!layout)
+    {
+        Logger::error("MaximizeToZone: layout not initialized");
+        return;
+    }
+
+    auto zones = layout->ZonesFromPoint(ptScreen);
+    workArea->MoveWindowIntoZoneByIndexSet(window, zones);
 }
 
 bool FancyZones::MoveToAppLastZone(HWND window, HMONITOR monitor) noexcept
@@ -686,18 +705,24 @@ LRESULT FancyZones::WndProc(HWND window, UINT message, WPARAM wparam, LPARAM lpa
         else if (message == WM_PRIV_LOCATIONCHANGE)
         {
             auto hwnd = reinterpret_cast<HWND>(wparam);
-            if (auto monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONULL))
+            POINT ptScreen;
+            GetPhysicalCursorPos(&ptScreen);
+
+            if (m_windowDrag)
             {
-                if (m_windowDrag)
-                {
-                    POINT ptScreen;
-                    GetPhysicalCursorPos(&ptScreen);
+                if (auto monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONULL))
+                {   
                     MoveSizeUpdate(monitor, ptScreen);
                 }
                 else
                 {
-                    RestoreMaximizedWindowSize(hwnd, monitor);
+                    Logger::error("Failed to get monitor on location change");
                 }
+            }
+            else
+            {
+                HMONITOR monitor = WorkAreaKeyFromWindow(window);
+                MaximizeToZone(hwnd, monitor, ptScreen);
             }
         }
         else if (message == WM_PRIV_WINDOWCREATED)

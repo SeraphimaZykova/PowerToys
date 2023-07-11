@@ -347,7 +347,7 @@ void FancyZones::MoveSizeEnd()
 
 void FancyZones::RestoreMaximizedWindowSize(HWND window, HMONITOR monitor)
 {
-    if (!FancyZonesSettings::settings().allowMaximizedAndFullscreenToZone)
+    if (!FancyZonesSettings::settings().maximizeToZone)
     {
         return;
     }
@@ -1258,6 +1258,13 @@ void FancyZones::UpdateActiveLayouts() noexcept
 bool FancyZones::ShouldProcessSnapHotkey(DWORD vkCode) noexcept
 {
     auto window = GetForegroundWindow();
+
+    // check fullscreen 
+    if (FancyZonesWindowUtils::IsFullscreen(window) && !FancyZonesSettings::settings().snapFullscreen)
+    {
+        Logger::debug("Fullscreen windows snapping not allowed");
+        return false;
+    }
 
     if (!FancyZonesWindowProcessing::IsProcessable(window))
     {

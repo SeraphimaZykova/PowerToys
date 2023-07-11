@@ -453,11 +453,6 @@ void FancyZones::WindowCreated(HWND window) noexcept
         return;
     }
 
-    if (!FancyZonesWindowProcessing::IsProcessable(window))
-    {
-        return;
-    }
-
     // Avoid already stamped (zoned) windows
     const bool isZoned = !FancyZonesWindowProperties::RetrieveZoneIndexProperty(window).empty();
     if (isZoned)
@@ -467,6 +462,11 @@ void FancyZones::WindowCreated(HWND window) noexcept
 
     const bool isCandidateForLastKnownZone = FancyZonesWindowUtils::IsCandidateForZoning(window);
     if (!isCandidateForLastKnownZone)
+    {
+        return;
+    }
+
+    if (!FancyZonesWindowProcessing::IsProcessable(window))
     {
         return;
     }

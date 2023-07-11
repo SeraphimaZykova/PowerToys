@@ -495,7 +495,7 @@ void FancyZonesWindowUtils::RestoreWindowOrigin(HWND window) noexcept
     }
 }
 
-RECT FancyZonesWindowUtils::AdjustRectForSizeWindowToRect(HWND window, RECT rect, HWND windowOfRect) noexcept
+RECT FancyZonesWindowUtils::AdjustRectForSizeWindowToRect(HWND window, RECT rect, HWND windowOfRect, bool force) noexcept
 {
     RECT newWindowRect = rect;
 
@@ -515,7 +515,7 @@ RECT FancyZonesWindowUtils::AdjustRectForSizeWindowToRect(HWND window, RECT rect
     }
 
     // Take care of windows that cannot be resized
-    if ((::GetWindowLong(window, GWL_STYLE) & WS_SIZEBOX) == 0)
+    if (!force && (::GetWindowLong(window, GWL_STYLE) & WS_SIZEBOX) == 0)
     {
         newWindowRect.right = newWindowRect.left + (windowRect.right - windowRect.left);
         newWindowRect.bottom = newWindowRect.top + (windowRect.bottom - windowRect.top);

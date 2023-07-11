@@ -127,12 +127,12 @@ WorkArea::~WorkArea()
     windowPool.FreeZonesOverlayWindow(m_window);
 }
 
-void WorkArea::MoveWindowIntoZoneByIndex(HWND window, ZoneIndex index)
+void WorkArea::MoveWindowIntoZoneByIndex(HWND window, ZoneIndex index, bool forceResize /*= false*/)
 {
-    MoveWindowIntoZoneByIndexSet(window, { index });
+    MoveWindowIntoZoneByIndexSet(window, { index }, true, forceResize);
 }
 
-void WorkArea::MoveWindowIntoZoneByIndexSet(HWND window, const ZoneIndexSet& indexSet, bool updatePosition /* = true*/)
+void WorkArea::MoveWindowIntoZoneByIndexSet(HWND window, const ZoneIndexSet& indexSet, bool updatePosition /* = true*/, bool forceResize /* = false*/)
 {
     if (!m_layout || !m_layoutWindows || m_layout->Zones().empty() || indexSet.empty())
     {
@@ -146,7 +146,7 @@ void WorkArea::MoveWindowIntoZoneByIndexSet(HWND window, const ZoneIndexSet& ind
         const auto rect = m_layout->GetCombinedZonesRect(indexSet);
         if (rect.bottom - rect.top > 0 && rect.right - rect.left > 0)
         {
-            const auto adjustedRect = FancyZonesWindowUtils::AdjustRectForSizeWindowToRect(window, rect, m_window);
+            const auto adjustedRect = FancyZonesWindowUtils::AdjustRectForSizeWindowToRect(window, rect, m_window, forceResize);
             FancyZonesWindowUtils::SizeWindowToRect(window, adjustedRect);
         }
     }
@@ -154,7 +154,7 @@ void WorkArea::MoveWindowIntoZoneByIndexSet(HWND window, const ZoneIndexSet& ind
     SnapWindow(window, indexSet);
 }
 
-bool WorkArea::MoveWindowIntoZoneByDirectionAndIndex(HWND window, DWORD vkCode, bool cycle)
+bool WorkArea::MoveWindowIntoZoneByDirectionAndIndex(HWND window, DWORD vkCode, bool cycle, bool forceResize /*= false*/)
 {
     if (!m_layout || !m_layoutWindows || m_layout->Zones().empty())
     {
@@ -167,7 +167,7 @@ bool WorkArea::MoveWindowIntoZoneByDirectionAndIndex(HWND window, DWORD vkCode, 
     // The window was not assigned to any zone here
     if (zoneIndexes.size() == 0)
     {
-        MoveWindowIntoZoneByIndex(window, vkCode == VK_LEFT ? numZones - 1 : 0);
+        MoveWindowIntoZoneByIndex(window, vkCode == VK_LEFT ? numZones - 1 : 0, forceResize);
     }
     else
     {
@@ -181,18 +181,18 @@ bool WorkArea::MoveWindowIntoZoneByDirectionAndIndex(HWND window, DWORD vkCode, 
                 return false;
             }
 
-            MoveWindowIntoZoneByIndex(window, vkCode == VK_LEFT ? numZones - 1 : 0);
+            MoveWindowIntoZoneByIndex(window, vkCode == VK_LEFT ? numZones - 1 : 0, forceResize);
         }
         else
         {
             // We didn't reach the edge
             if (vkCode == VK_LEFT)
             {
-                MoveWindowIntoZoneByIndex(window, oldId - 1);
+                MoveWindowIntoZoneByIndex(window, oldId - 1, forceResize);
             }
             else
             {
-                MoveWindowIntoZoneByIndex(window, oldId + 1);
+                MoveWindowIntoZoneByIndex(window, oldId + 1, forceResize);
             }
         }
     }
@@ -200,7 +200,7 @@ bool WorkArea::MoveWindowIntoZoneByDirectionAndIndex(HWND window, DWORD vkCode, 
     return true;
 }
 
-bool WorkArea::MoveWindowIntoZoneByDirectionAndPosition(HWND window, DWORD vkCode, bool cycle)
+bool WorkArea::MoveWindowIntoZoneByDirectionAndPosition(HWND window, DWORD vkCode, bool cycle, bool forceResize /* = false*/)
 {
     if (!m_layout || !m_layoutWindows || m_layout->Zones().empty())
     {
@@ -244,7 +244,7 @@ bool WorkArea::MoveWindowIntoZoneByDirectionAndPosition(HWND window, DWORD vkCod
     auto result = FancyZonesUtils::ChooseNextZoneByPosition(vkCode, windowRect, zoneRects);
     if (result < zoneRects.size())
     {
-        MoveWindowIntoZoneByIndex(window, freeZoneIndices[result]);
+        MoveWindowIntoZoneByIndex(window, freeZoneIndices[result], forceResize);
         Trace::FancyZones::KeyboardSnapWindowToZone(m_layout.get(), m_layoutWindows.get());
         return true;
     }
@@ -259,7 +259,7 @@ bool WorkArea::MoveWindowIntoZoneByDirectionAndPosition(HWND window, DWORD vkCod
 
         if (result < zoneRects.size())
         {
-            MoveWindowIntoZoneByIndex(window, result);
+            MoveWindowIntoZoneByIndex(window, result, forceResize);
             Trace::FancyZones::KeyboardSnapWindowToZone(m_layout.get(), m_layoutWindows.get());
             return true;
         }
@@ -490,7 +490,8 @@ void WorkArea::UpdateWindowPositions()
     const auto& snappedWindows = m_layoutWindows->SnappedWindows();
     for (const auto& [window, zones] : snappedWindows)
     {
-        MoveWindowIntoZoneByIndexSet(window, zones, true);
+        const bool forceResizeFullscreen = FancyZonesSettings::settings().snapFullscreen && FancyZonesWindowUtils::IsFullscreen(window);
+        MoveWindowIntoZoneByIndexSet(window, zones, true, forceResizeFullscreen);
     }
 }
 

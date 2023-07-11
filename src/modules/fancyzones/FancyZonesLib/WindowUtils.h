@@ -33,7 +33,7 @@ namespace FancyZonesWindowUtils
     void RestoreWindowSize(HWND window) noexcept;
     void RestoreWindowOrigin(HWND window) noexcept;
     void MakeWindowTransparent(HWND window);
-    RECT AdjustRectForSizeWindowToRect(HWND window, RECT rect, HWND windowOfRect) noexcept; // Parameter rect is in windowOfRect coordinates
+    RECT AdjustRectForSizeWindowToRect(HWND window, RECT rect, HWND windowOfRect, bool force = false) noexcept; // Parameter rect is in windowOfRect coordinates
 
     void DisableRoundCorners(HWND window) noexcept;
     void ResetRoundCornersPreference(HWND window) noexcept;

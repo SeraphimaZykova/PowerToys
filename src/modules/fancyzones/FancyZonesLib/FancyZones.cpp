@@ -437,7 +437,8 @@ bool FancyZones::MoveToAppLastZone(HWND window, HMONITOR monitor) noexcept
     if (!indexes.empty() && workArea)
     {
         Trace::FancyZones::SnapNewWindowIntoZone(workArea->GetLayout().get(), workArea->GetLayoutWindows().get());
-        workArea->MoveWindowIntoZoneByIndexSet(window, indexes);
+        const bool forceResizeFullscreen = FancyZonesSettings::settings().snapFullscreen && FancyZonesWindowUtils::IsFullscreen(window);
+        workArea->MoveWindowIntoZoneByIndexSet(window, indexes, true,  forceResizeFullscreen);
 
         return true;
     }
@@ -960,7 +961,8 @@ bool FancyZones::OnSnapHotkeyBasedOnZoneNumber(HWND window, DWORD vkCode) noexce
         do
         {
             auto workArea = m_workAreaHandler.GetWorkArea(*currMonitorInfo);
-            if (workArea && workArea->MoveWindowIntoZoneByDirectionAndIndex(window, vkCode, false /* cycle through zones */))
+            const bool forceResizeFullscreen = FancyZonesSettings::settings().snapFullscreen && FancyZonesWindowUtils::IsFullscreen(window);
+            if (workArea && workArea->MoveWindowIntoZoneByDirectionAndIndex(window, vkCode, false /* cycle through zones */, forceResizeFullscreen))
             {
                 // unassign from previous work area
                 for (auto& [_, prevWorkArea] : m_workAreaHandler.GetAllWorkAreas())
@@ -999,7 +1001,8 @@ bool FancyZones::OnSnapHotkeyBasedOnZoneNumber(HWND window, DWORD vkCode) noexce
         // Single monitor environment, or combined multi-monitor environment.
         if (FancyZonesSettings::settings().restoreSize)
         {
-            bool moved = workArea && workArea->MoveWindowIntoZoneByDirectionAndIndex(window, vkCode, false /* cycle through zones */);
+            const bool forceResizeFullscreen = FancyZonesSettings::settings().snapFullscreen && FancyZonesWindowUtils::IsFullscreen(window);
+            bool moved = workArea && workArea->MoveWindowIntoZoneByDirectionAndIndex(window, vkCode, false /* cycle through zones */, forceResizeFullscreen);
             if (!moved)
             {
                 FancyZonesWindowUtils::RestoreWindowOrigin(window);
@@ -1013,7 +1016,8 @@ bool FancyZones::OnSnapHotkeyBasedOnZoneNumber(HWND window, DWORD vkCode) noexce
         }
         else
         {
-            bool moved = workArea && workArea->MoveWindowIntoZoneByDirectionAndIndex(window, vkCode, true /* cycle through zones */);
+            const bool forceResizeFullscreen = FancyZonesSettings::settings().snapFullscreen && FancyZonesWindowUtils::IsFullscreen(window);
+            bool moved = workArea && workArea->MoveWindowIntoZoneByDirectionAndIndex(window, vkCode, true /* cycle through zones */, forceResizeFullscreen);
 
             if (moved)
             {
@@ -1095,7 +1099,8 @@ bool FancyZones::OnSnapHotkeyBasedOnPosition(HWND window, DWORD vkCode) noexcept
             const auto& [trueZoneIdx, workArea] = zoneRectsInfo[chosenIdx];
             if (workArea)
             {
-                workArea->MoveWindowIntoZoneByIndexSet(window, { trueZoneIdx });
+                const bool forceResizeFullscreen = FancyZonesSettings::settings().snapFullscreen && FancyZonesWindowUtils::IsFullscreen(window);
+                workArea->MoveWindowIntoZoneByIndexSet(window, { trueZoneIdx }, true, forceResizeFullscreen);
                 Trace::FancyZones::KeyboardSnapWindowToZone(workArea->GetLayout().get(), workArea->GetLayoutWindows().get());
             }
 
@@ -1145,7 +1150,8 @@ bool FancyZones::OnSnapHotkeyBasedOnPosition(HWND window, DWORD vkCode) noexcept
 
             if (workArea)
             {
-                workArea->MoveWindowIntoZoneByIndexSet(window, { trueZoneIdx });
+                const bool forceResizeFullscreen = FancyZonesSettings::settings().snapFullscreen && FancyZonesWindowUtils::IsFullscreen(window);
+                workArea->MoveWindowIntoZoneByIndexSet(window, { trueZoneIdx }, true, forceResizeFullscreen);
                 Trace::FancyZones::KeyboardSnapWindowToZone(workArea->GetLayout().get(), workArea->GetLayoutWindows().get());
             }
             
@@ -1190,7 +1196,8 @@ bool FancyZones::ProcessDirectedSnapHotkey(HWND window, DWORD vkCode, bool cycle
     }
     else
     {
-        bool result = workArea && workArea->MoveWindowIntoZoneByDirectionAndPosition(window, vkCode, cycle);
+        const bool forceResizeFullscreen = FancyZonesSettings::settings().snapFullscreen && FancyZonesWindowUtils::IsFullscreen(window);
+        bool result = workArea && workArea->MoveWindowIntoZoneByDirectionAndPosition(window, vkCode, cycle, forceResizeFullscreen);
         if (result)
         {
             Trace::FancyZones::KeyboardSnapWindowToZone(workArea->GetLayout().get(), workArea->GetLayoutWindows().get());

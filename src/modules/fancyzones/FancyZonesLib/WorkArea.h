@@ -45,10 +45,10 @@ public:
     
     ZoneIndexSet GetWindowZoneIndexes(HWND window) const;
 
-    void MoveWindowIntoZoneByIndex(HWND window, ZoneIndex index);
-    void MoveWindowIntoZoneByIndexSet(HWND window, const ZoneIndexSet& indexSet, bool updatePosition = true);
-    bool MoveWindowIntoZoneByDirectionAndIndex(HWND window, DWORD vkCode, bool cycle);
-    bool MoveWindowIntoZoneByDirectionAndPosition(HWND window, DWORD vkCode, bool cycle);
+    void MoveWindowIntoZoneByIndex(HWND window, ZoneIndex index, bool forceResize = false);
+    void MoveWindowIntoZoneByIndexSet(HWND window, const ZoneIndexSet& indexSet, bool updatePosition = true, bool forceResize = false);
+    bool MoveWindowIntoZoneByDirectionAndIndex(HWND window, DWORD vkCode, bool cycle, bool forceResize = false);
+    bool MoveWindowIntoZoneByDirectionAndPosition(HWND window, DWORD vkCode, bool cycle, bool forceResize = false);
     bool ExtendWindowByDirectionAndPosition(HWND window, DWORD vkCode);
 
     void SnapWindow(HWND window, const ZoneIndexSet& zones, bool extend = false);

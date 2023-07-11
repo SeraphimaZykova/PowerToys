@@ -374,7 +374,7 @@ void FancyZones::MaximizeToZone(HWND window, HMONITOR monitor, POINT const& ptSc
         // not allowed to be zoned
         return;
     }
-
+    
     const auto& activeWorkAreas = m_workAreaHandler.GetAllWorkAreas();
     auto iter = activeWorkAreas.find(monitor);
     if (iter == end(activeWorkAreas))
@@ -721,7 +721,7 @@ LRESULT FancyZones::WndProc(HWND window, UINT message, WPARAM wparam, LPARAM lpa
             }
             else
             {
-                HMONITOR monitor = WorkAreaKeyFromWindow(window);
+                HMONITOR monitor = WorkAreaKeyFromWindow(hwnd);
                 MaximizeToZone(hwnd, monitor, ptScreen);
             }
         }

@@ -206,6 +206,18 @@
                             </labs:SettingsCard>
                             <labs:SettingsCard ContentAlignment="Left">
                                 <controls:CheckBoxWithDescriptionControl
+                                    x:Uid="FancyZones_MaximizeToZone"
+                                    Margin="0,0,0,6"
+                                    IsChecked="{x:Bind Mode=TwoWay, Path=ViewModel.MaximizeToZone}" />
+                            </labs:SettingsCard>
+                            <labs:SettingsCard ContentAlignment="Left">
+                                <controls:CheckBoxWithDescriptionControl
+                                    x:Uid="FancyZones_SnapFullscreen"
+                                    Margin="0,0,0,6"
+                                    IsChecked="{x:Bind Mode=TwoWay, Path=ViewModel.SnapFullscreen}" />
+                            </labs:SettingsCard>
+                            <labs:SettingsCard ContentAlignment="Left">
+                                <controls:CheckBoxWithDescriptionControl
                                     x:Uid="FancyZones_AllowPopupWindowSnap"
                                     Margin="0,0,0,6"
                                     IsChecked="{x:Bind Mode=TwoWay, Path=ViewModel.AllowPopupWindowSnap}" />

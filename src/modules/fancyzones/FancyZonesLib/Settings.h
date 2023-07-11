@@ -35,7 +35,8 @@ struct Settings
     bool appLastZone_moveWindows = false;
     bool openWindowOnActiveMonitor = false;
     bool restoreSize = false;
-    bool allowMaximizedAndFullscreenToZone = false;
+    bool maximizeToZone = false;
+    bool snapFullscreen = false;
     bool quickLayoutSwitch = true;
     bool flashZonesOnQuickSwitch = true;
     bool use_cursorpos_editor_startupscreen = true;

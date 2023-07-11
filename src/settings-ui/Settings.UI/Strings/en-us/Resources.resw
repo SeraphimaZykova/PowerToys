@@ -2150,7 +2150,7 @@ From there, simply click on one of the supported files in the File Explorer and 
   <data name="OobeWindow_Title" xml:space="preserve">
     <value>Welcome to PowerToys</value>
   </data>
-	<data name="OobeWindow_TitleTxt.Text" xml:space="preserve">
+  <data name="OobeWindow_TitleTxt.Text" xml:space="preserve">
     <value>Welcome to PowerToys</value>
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
@@ -2469,10 +2469,10 @@ From there, simply click on one of the supported files in the File Explorer and 
     <value>Cancel</value>
   </data>
   <data name="Activation_Shortcut_Description.Text" xml:space="preserve">
-	<value>Press a combination of keys to change this shortcut</value>
+    <value>Press a combination of keys to change this shortcut</value>
   </data>
   <data name="Activation_Shortcut_Reset" xml:space="preserve">
-	<value>Reset</value>
+    <value>Reset</value>
   </data>
   <data name="Activation_Shortcut_Save" xml:space="preserve">
     <value>Save</value>
@@ -3318,7 +3318,7 @@ Activate by holding the key for the character you want to add an accent to, then
   <data name="FileLocksmith_Toggle_StandardContextMenu.Content" xml:space="preserve">
     <value>Default and extended context menu</value>
   </data>
-	<data name="FileLocksmith_Toggle_ExtendedContextMenu.Content" xml:space="preserve">
+  <data name="FileLocksmith_Toggle_ExtendedContextMenu.Content" xml:space="preserve">
     <value>Extended context menu only</value>
   </data>
   <data name="FileLocksmith_Toggle_ContextMenu.Header" xml:space="preserve">
@@ -3551,9 +3551,9 @@ Activate by holding the key for the character you want to add an accent to, then
     <value>Maximum width (px)</value>
     <comment>px = pixels</comment>
   </data>
-	<data name="SettingsWindow_TitleTxt.Text" xml:space="preserve">
+  <data name="SettingsWindow_TitleTxt.Text" xml:space="preserve">
     <value>PowerToys Settings</value>
-	  </data>
+  </data>
   <data name="Oobe_Peek.Description" xml:space="preserve">
     <value>A lightning fast file preview feature for Windows.</value>
   </data>
@@ -3581,5 +3581,17 @@ Activate by holding the key for the character you want to add an accent to, then
   </data>
   <data name="Hosts_Encoding_Utf8Bom.Content" xml:space="preserve">
     <value>UTF-8 with BOM</value>
+  </data>
+  <data name="FancyZones_MaximizeToZone.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="FancyZones_MaximizeToZone.Header" xml:space="preserve">
+    <value>Snap window to the nearest zone when click Maximize button</value>
+  </data>
+  <data name="FancyZones_SnapFullscreen.Description" xml:space="preserve">
+    <value>Allows to snap some fullscreen windows (e.g. games) when it's possible.</value>
+  </data>
+  <data name="FancyZones_SnapFullscreen.Header" xml:space="preserve">
+    <value>Allow snapping fullscreen windows</value>
   </data>
 </root>

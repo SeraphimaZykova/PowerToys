@@ -50,7 +50,8 @@
 #define MoveWindowsToLastZoneOnAppOpeningKey "MoveWindowsToLastZoneOnAppOpening"
 #define OpenWindowOnActiveMonitorKey "OpenWindowOnActiveMonitor"
 #define RestoreSizeKey "RestoreSize"
-#define AllowMaximizedAndFullscreenToZone "AllowMaximizedAndFullscreenToZone"
+#define MaximizeToZone "MaximizeToZone"
+#define SnapFullscreen "SnapFullscreen"
 #define QuickLayoutSwitchKey "QuickLayoutSwitch"
 #define FlashZonesOnQuickSwitchKey "FlashZonesOnQuickSwitch"
 #define UseCursorPosOnEditorStartupKey "UseCursorPosOnEditorStartup"
@@ -317,7 +318,8 @@ void Trace::SettingsTelemetry(const Settings& settings) noexcept
         TraceLoggingBoolean(settings.appLastZone_moveWindows, MoveWindowsToLastZoneOnAppOpeningKey),
         TraceLoggingBoolean(settings.openWindowOnActiveMonitor, OpenWindowOnActiveMonitorKey),
         TraceLoggingBoolean(settings.restoreSize, RestoreSizeKey),
-        TraceLoggingBoolean(settings.allowMaximizedAndFullscreenToZone, AllowMaximizedAndFullscreenToZone),
+        TraceLoggingBoolean(settings.maximizeToZone, MaximizeToZone),
+        TraceLoggingBoolean(settings.snapFullscreen, SnapFullscreen),
         TraceLoggingBoolean(settings.quickLayoutSwitch, QuickLayoutSwitchKey),
         TraceLoggingBoolean(settings.flashZonesOnQuickSwitch, FlashZonesOnQuickSwitchKey),
         TraceLoggingBoolean(settings.use_cursorpos_editor_startupscreen, UseCursorPosOnEditorStartupKey),

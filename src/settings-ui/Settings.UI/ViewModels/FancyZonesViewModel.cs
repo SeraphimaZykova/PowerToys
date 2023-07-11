@@ -83,6 +83,8 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             _appLastZoneMoveWindows = Settings.Properties.FancyzonesAppLastZoneMoveWindows.Value;
             _openWindowOnActiveMonitor = Settings.Properties.FancyzonesOpenWindowOnActiveMonitor.Value;
             _restoreSize = Settings.Properties.FancyzonesRestoreSize.Value;
+            _maximizeToZone = Settings.Properties.FancyzonesMaximizeToZone.Value;
+            _snapFullscreen = Settings.Properties.FancyzonesSnapFullscreen.Value;
             _quickLayoutSwitch = Settings.Properties.FancyzonesQuickLayoutSwitch.Value;
             _flashZonesOnQuickLayoutSwitch = Settings.Properties.FancyzonesFlashZonesOnQuickSwitch.Value;
             _useCursorPosEditorStartupScreen = Settings.Properties.UseCursorposEditorStartupscreen.Value;
@@ -157,6 +159,8 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
         private bool _openWindowOnActiveMonitor;
         private bool _spanZonesAcrossMonitors;
         private bool _restoreSize;
+        private bool _maximizeToZone;
+        private bool _snapFullscreen;
         private bool _quickLayoutSwitch;
         private bool _flashZonesOnQuickLayoutSwitch;
         private bool _useCursorPosEditorStartupScreen;
@@ -459,6 +463,42 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
                 {
                     _restoreSize = value;
                     Settings.Properties.FancyzonesRestoreSize.Value = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool MaximizeToZone
+        {
+            get
+            {
+                return _maximizeToZone;
+            }
+
+            set
+            {
+                if (value != _maximizeToZone)
+                {
+                    _maximizeToZone = value;
+                    Settings.Properties.FancyzonesMaximizeToZone.Value = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool SnapFullscreen
+        {
+            get
+            {
+                return _snapFullscreen;
+            }
+
+            set
+            {
+                if (value != _snapFullscreen)
+                {
+                    _snapFullscreen = value;
+                    Settings.Properties.FancyzonesSnapFullscreen.Value = value;
                     NotifyPropertyChanged();
                 }
             }

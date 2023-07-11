@@ -26,7 +26,8 @@ namespace NonLocalizable
     const wchar_t AppLastZoneMoveWindowsID[] = L"fancyzones_appLastZone_moveWindows";
     const wchar_t OpenWindowOnActiveMonitorID[] = L"fancyzones_openWindowOnActiveMonitor";
     const wchar_t RestoreSizeID[] = L"fancyzones_restoreSize";
-    const wchar_t AllowMaximizedAndFullscreenToZoneID[] = L"fancyzones_allowMaximizedAndFullscreenToZone";
+    const wchar_t MaximizeToZoneID[] = L"fancyzones_maximizeToZone";
+    const wchar_t SnapFullscreenID[] = L"fancyzones_snapFullscreen";
     const wchar_t QuickLayoutSwitch[] = L"fancyzones_quickLayoutSwitch";
     const wchar_t FlashZonesOnQuickSwitch[] = L"fancyzones_flashZonesOnQuickSwitch";
     const wchar_t UseCursorPosEditorStartupScreenID[] = L"use_cursorpos_editor_startupscreen";
@@ -117,7 +118,8 @@ void FancyZonesSettings::LoadSettings()
         SetBoolFlag(values, NonLocalizable::AppLastZoneMoveWindowsID, SettingId::AppLastZoneMoveWindows, m_settings.appLastZone_moveWindows);
         SetBoolFlag(values, NonLocalizable::OpenWindowOnActiveMonitorID, SettingId::OpenWindowOnActiveMonitor, m_settings.openWindowOnActiveMonitor);
         SetBoolFlag(values, NonLocalizable::RestoreSizeID, SettingId::RestoreWindowSize, m_settings.restoreSize);
-        SetBoolFlag(values, NonLocalizable::AllowMaximizedAndFullscreenToZoneID, SettingId::AllowMaximizedAndFullscreenToZone, m_settings.allowMaximizedAndFullscreenToZone);
+        SetBoolFlag(values, NonLocalizable::MaximizeToZoneID, SettingId::MaximizeToZone, m_settings.maximizeToZone);
+        SetBoolFlag(values, NonLocalizable::SnapFullscreenID, SettingId::SnapFullscreen, m_settings.snapFullscreen);
         SetBoolFlag(values, NonLocalizable::QuickLayoutSwitch, SettingId::QuickLayoutSwitch, m_settings.quickLayoutSwitch);
         SetBoolFlag(values, NonLocalizable::FlashZonesOnQuickSwitch, SettingId::FlashZonesOnQuickSwitch, m_settings.flashZonesOnQuickSwitch);
         SetBoolFlag(values, NonLocalizable::UseCursorPosEditorStartupScreenID, SettingId::LaunchEditorOnScreenWhereCursorPlaced, m_settings.use_cursorpos_editor_startupscreen);

@@ -64,6 +64,8 @@ namespace ViewModelTests
             Assert.AreEqual(originalSettings.Properties.FancyzonesOpenWindowOnActiveMonitor.Value, viewModel.OpenWindowOnActiveMonitor);
             Assert.AreEqual(originalSettings.Properties.FancyzonesOverrideSnapHotkeys.Value, viewModel.OverrideSnapHotkeys);
             Assert.AreEqual(originalSettings.Properties.FancyzonesRestoreSize.Value, viewModel.RestoreSize);
+            Assert.AreEqual(originalSettings.Properties.FancyzonesMaximizeToZone.Value, viewModel.MaximizeToZone);
+            Assert.AreEqual(originalSettings.Properties.FancyzonesSnapFullscreen.Value, viewModel.SnapFullscreen);
             Assert.AreEqual(originalSettings.Properties.FancyzonesShiftDrag.Value, viewModel.ShiftDrag);
             Assert.AreEqual(originalSettings.Properties.FancyzonesShowOnAllMonitors.Value, viewModel.ShowOnAllMonitors);
             Assert.AreEqual(originalSettings.Properties.FancyzonesSpanZonesAcrossMonitors.Value, viewModel.SpanZonesAcrossMonitors);
@@ -356,6 +358,42 @@ namespace ViewModelTests
             // assert
             var expected = viewModel.RestoreSize;
             var actual = SettingsRepository<FancyZonesSettings>.GetInstance(mockFancyZonesSettingsUtils.Object).SettingsConfig.Properties.FancyzonesRestoreSize.Value;
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void MaximizeToZoneShouldSetValue2TrueWhenSuccessful()
+        {
+            Mock<SettingsUtils> mockSettingsUtils = new Mock<SettingsUtils>();
+
+            // arrange
+            FancyZonesViewModel viewModel = new FancyZonesViewModel(mockSettingsUtils.Object, SettingsRepository<GeneralSettings>.GetInstance(mockGeneralSettingsUtils.Object), SettingsRepository<FancyZonesSettings>.GetInstance(mockFancyZonesSettingsUtils.Object), sendMockIPCConfigMSG, FancyZonesTestFolderName);
+            Assert.IsFalse(viewModel.MaximizeToZone); // check if value was initialized to false.
+
+            // act
+            viewModel.MaximizeToZone = true;
+
+            // assert
+            var expected = viewModel.MaximizeToZone;
+            var actual = SettingsRepository<FancyZonesSettings>.GetInstance(mockFancyZonesSettingsUtils.Object).SettingsConfig.Properties.FancyzonesMaximizeToZone.Value;
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void SnapFullscreenShouldSetValue2TrueWhenSuccessful()
+        {
+            Mock<SettingsUtils> mockSettingsUtils = new Mock<SettingsUtils>();
+
+            // arrange
+            FancyZonesViewModel viewModel = new FancyZonesViewModel(mockSettingsUtils.Object, SettingsRepository<GeneralSettings>.GetInstance(mockGeneralSettingsUtils.Object), SettingsRepository<FancyZonesSettings>.GetInstance(mockFancyZonesSettingsUtils.Object), sendMockIPCConfigMSG, FancyZonesTestFolderName);
+            Assert.IsFalse(viewModel.SnapFullscreen); // check if value was initialized to false.
+
+            // act
+            viewModel.SnapFullscreen = true;
+
+            // assert
+            var expected = viewModel.SnapFullscreen;
+            var actual = SettingsRepository<FancyZonesSettings>.GetInstance(mockFancyZonesSettingsUtils.Object).SettingsConfig.Properties.FancyzonesSnapFullscreen.Value;
             Assert.AreEqual(expected, actual);
         }
 

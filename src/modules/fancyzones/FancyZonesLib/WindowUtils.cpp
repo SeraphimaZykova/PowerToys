@@ -144,6 +144,53 @@ bool FancyZonesWindowUtils::IsMaximized(HWND window) noexcept
     return false;
 }
 
+bool FancyZonesWindowUtils::IsFullscreen(HWND window) noexcept
+{
+    RECT windowRect;
+    if (!GetWindowRect(window, &windowRect))
+    {
+        Logger::error("IsFullscreen: Failed to get window rect");
+        return false;
+    }
+
+    HMONITOR monitor = MonitorFromRect(&windowRect, MONITOR_DEFAULTTONULL);
+    if (!monitor)
+    {
+        Logger::error("IsFullscreen: Failed to get monitor");
+        return false;
+    }
+
+    MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+    if (!GetMonitorInfo(monitor, &monitorInfo))
+    {
+        Logger::error("IsFullscreen: Failed to get monitor info");
+        return false;
+    }
+
+    // It should be the main monitor.
+    if (!(monitorInfo.dwFlags & MONITORINFOF_PRIMARY))
+    {
+        return false;
+    }
+
+    // The window should be as large as the monitor
+    auto monitorWidth = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+    auto monitorHeight = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+    auto windowWidth = windowRect.right - windowRect.left;
+    auto windowHeight = windowRect.bottom - windowRect.top;
+
+    // in some cases windows width or height could be 1 pixel less than monitors
+    if (std::abs(monitorWidth - windowWidth) > 1 && std::abs(monitorHeight - windowHeight) > 1)
+    {
+        return false;
+    }
+
+    LONG style = ::GetWindowLong(window, GWL_STYLE);
+    LONG ext_style = ::GetWindowLong(window, GWL_EXSTYLE);
+    return !((style & (WS_DLGFRAME | WS_THICKFRAME)) ||
+             (ext_style & (WS_EX_WINDOWEDGE | WS_EX_TOOLWINDOW)));
+}
+
 bool FancyZonesWindowUtils::HasVisibleOwner(HWND window) noexcept
 {
     auto owner = GetWindow(window, GW_OWNER);

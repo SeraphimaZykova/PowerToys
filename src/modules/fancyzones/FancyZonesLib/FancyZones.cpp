@@ -359,7 +359,7 @@ void FancyZones::RestoreMaximizedWindowSize(HWND window, HMONITOR monitor)
         return;
     }
 
-    if (!FancyZonesWindowUtils::IsWindowMaximized(window))
+    if (!FancyZonesWindowUtils::IsMaximized(window))
     {
         // check if window maximized to avoid side-effects, e.g. when it's resized
         return;

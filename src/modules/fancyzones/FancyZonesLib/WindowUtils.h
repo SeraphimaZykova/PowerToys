@@ -16,7 +16,7 @@
 namespace FancyZonesWindowUtils
 {
     bool IsSplashScreen(HWND window);
-    bool IsWindowMaximized(HWND window) noexcept;
+    bool IsMaximized(HWND window) noexcept;
     bool HasVisibleOwner(HWND window) noexcept;
     bool IsStandardWindow(HWND window);
     bool IsPopupWindow(HWND window) noexcept;

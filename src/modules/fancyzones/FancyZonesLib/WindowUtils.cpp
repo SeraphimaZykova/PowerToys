@@ -133,7 +133,7 @@ bool FancyZonesWindowUtils::IsSplashScreen(HWND window)
     return wcscmp(NonLocalizable::SplashClassName, className) == 0;
 }
 
-bool FancyZonesWindowUtils::IsWindowMaximized(HWND window) noexcept
+bool FancyZonesWindowUtils::IsMaximized(HWND window) noexcept
 {
     WINDOWPLACEMENT placement{};
     if (GetWindowPlacement(window, &placement) &&

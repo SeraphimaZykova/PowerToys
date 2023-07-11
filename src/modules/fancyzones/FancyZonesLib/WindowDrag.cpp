@@ -118,7 +118,7 @@ void WindowDrag::MoveSizeEnd()
 
         if ((isStandardWindow == false && hasNoVisibleOwner == true &&
              m_windowProperties.isStandardWindow == true && m_windowProperties.hasNoVisibleOwner == true) ||
-             FancyZonesWindowUtils::IsWindowMaximized(m_window))
+             FancyZonesWindowUtils::IsMaximized(m_window))
         {
             // Abort the zoning, this is a Chromium based tab that is merged back with an existing window
             // or if the window is maximized by Windows when the cursor hits the screen top border
@@ -137,7 +137,7 @@ void WindowDrag::MoveSizeEnd()
             {
                 ::RemoveProp(m_window, ZonedWindowProperties::PropertyRestoreSizeID);
             }
-            else if (!FancyZonesWindowUtils::IsWindowMaximized(m_window))
+            else if (!FancyZonesWindowUtils::IsMaximized(m_window))
             {
                 FancyZonesWindowUtils::RestoreWindowSize(m_window);
             }

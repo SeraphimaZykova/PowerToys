@@ -391,7 +391,9 @@ void FancyZones::MaximizeToZone(HWND window, HMONITOR monitor, POINT const& ptSc
         return;
     }
 
-    auto zones = layout->ZonesFromPoint(ptScreen);
+    POINT ptClient = ptScreen;
+    MapWindowPoints(nullptr, workArea->GetWorkAreaWindow(), &ptClient, 1);
+    auto zones = layout->ZonesFromPoint(ptClient);
     workArea->MoveWindowIntoZoneByIndexSet(window, zones);
 }
 

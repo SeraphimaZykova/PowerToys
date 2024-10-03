@@ -5,6 +5,7 @@
 #include <WorkspacesLib/AppUtils.h>
 #include <WorkspacesLib/IPCHelper.h>
 #include <WorkspacesLib/LaunchingStatus.h>
+#include <WorkspacesLib/WbemHelper.h>
 #include <WorkspacesLib/WorkspacesData.h>
 
 class WindowArranger
@@ -21,6 +22,7 @@ private:
     //const WindowCreationHandler m_windowCreationHandler;
     const IPCHelper& m_ipcHelper;
     WorkspacesData::LaunchingAppStateMap m_launchingApps{};
+    WbemHelper wbemHelper;
     
     //void onWindowCreated(HWND window);
     void processWindow(HWND window);

@@ -11,6 +11,8 @@
 #include <workspaces-common/WindowFilter.h>
 #include <workspaces-common/WindowUtils.h>
 
+#include <WorkspacesLib/CLIArguments.h>
+
 #include <WindowProperties/WorkspacesWindowPropertyUtils.h>
 
 namespace FancyZones
@@ -107,6 +109,8 @@ WindowArranger::WindowArranger(WorkspacesData::WorkspacesProject project, const 
         m_launchingApps.insert({ app, { app, nullptr } });
     }
 
+    wbemHelper.Initialize();
+    
     m_ipcHelper.send(L"ready");
 
     for (int attempt = 0; attempt < 50 && !allWindowsFound(); attempt++)
@@ -176,9 +180,14 @@ void WindowArranger::processWindow(HWND window)
         return;
     }
 
+    auto cliArgs = CLIArguments::GetCommandLineArgs(pid, wbemHelper);
+
     auto iter = std::find_if(m_launchingApps.begin(), m_launchingApps.end(), [&](const auto& val) 
         { 
-            return val.second.state == LaunchingState::Waiting && !val.second.window && (val.first.name == data.value().name || val.first.path == data.value().installPath); 
+            return val.second.state == LaunchingState::Waiting && 
+                !val.second.window && 
+                (val.first.name == data.value().name || val.first.path == data.value().installPath) &&
+                cliArgs == val.first.commandLineArgs; 
         });
     if (iter == m_launchingApps.end())
     {

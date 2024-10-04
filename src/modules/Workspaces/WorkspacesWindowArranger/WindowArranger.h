@@ -21,14 +21,13 @@ private:
     const Utils::Apps::AppList m_installedApps;
     //const WindowCreationHandler m_windowCreationHandler;
     IPCHelper m_ipcHelper;
-    WorkspacesData::LaunchingAppStateMap m_launchingApps{};
+    LaunchingStatus m_launchingStatus;
     WbemHelper wbemHelper;
     
     //void onWindowCreated(HWND window);
     void processWindow(HWND window);
     bool moveWindow(HWND window, const WorkspacesData::WorkspacesProject::Application& app);
 
-    bool allWindowsFound() const;
     void receiveIpcMessage(const std::wstring& message);
     void sendUpdatedState(const WorkspacesData::LaunchingAppState& data) const;
 };

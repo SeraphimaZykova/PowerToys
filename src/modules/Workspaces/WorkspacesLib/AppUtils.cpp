@@ -364,7 +364,7 @@ namespace Utils
             if (app.packageFullName != installedApp->packageFullName)
             {
                 app.packageFullName = installedApp->packageFullName;
-                Logger::trace(L"Updating app version: updated package full name");
+                Logger::trace(L"Updating app {} version: updated package full name", app.name);
                 updated = true;
             }
 
@@ -413,7 +413,7 @@ namespace Utils
                     }
                     else
                     {
-                        Logger::trace(L"Updating app version: different file names, won't update path");
+                        Logger::trace(L"Updating app {} version: different file names, won't update path", app.name);
                     }
                 }
                 catch (std::exception& ex)

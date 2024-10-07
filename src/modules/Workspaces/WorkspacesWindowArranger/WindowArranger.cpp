@@ -174,15 +174,12 @@ void WindowArranger::processWindow(HWND window)
         return;
     }
 
-    auto cliArgs = CLIArguments::GetCommandLineArgs(pid, wbemHelper);
-
     const auto& apps = m_launchingStatus.Get();
     auto iter = std::find_if(apps.begin(), apps.end(), [&](const auto& val) 
         { 
             return val.second.state == LaunchingState::Launched && 
                 !val.second.window && 
-                (val.first.name == data.value().name || val.first.path == data.value().installPath) &&
-                cliArgs == val.first.commandLineArgs; 
+                (val.first.name == data.value().name || val.first.path == data.value().installPath); 
         });
 
     if (iter == apps.end())

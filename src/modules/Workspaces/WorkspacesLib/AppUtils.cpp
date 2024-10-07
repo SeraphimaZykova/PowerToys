@@ -33,6 +33,16 @@ namespace Utils
             constexpr const wchar_t* Exe = L".EXE";
         }
 
+        namespace StringUtils
+        {
+            std::wstring ToUpper(const std::wstring& str)
+            {
+                std::wstring upper(str);
+                std::transform(upper.begin(), upper.end(), upper.begin(), towupper);
+                return upper;
+            }
+        }
+
         AppList IterateAppsFolder()
         {
             AppList result{};
@@ -341,5 +351,95 @@ namespace Utils
 
             return Utils::Apps::GetApp(processPath, pid, apps);
         }
+
+        bool UpdateAppVersion(WorkspacesData::WorkspacesProject::Application& app, const AppList& installedApps)
+        {
+            auto installedApp = std::find_if(installedApps.begin(), installedApps.end(), [&](const AppData& val) { return val.name == app.name; });
+            if (installedApp == installedApps.end())
+            {
+                return false;
+            }
+
+            bool updated = false;
+            if (app.packageFullName != installedApp->packageFullName)
+            {
+                app.packageFullName = installedApp->packageFullName;
+                Logger::trace(L"Updating app version: updated package full name");
+                updated = true;
+            }
+
+            std::wstring installPath = installedApp->installPath;
+            std::wstring installPathUpper = StringUtils::ToUpper(installedApp->installPath);
+            std::wstring appPathUpper = StringUtils::ToUpper(app.path);
+
+            // edge case: File Explorer
+            if (appPathUpper == NonLocalizable::FileExplorerPath)
+            {
+                return updated;
+            }
+
+            if (!installPathUpper.ends_with(NonLocalizable::Exe) && appPathUpper.ends_with(NonLocalizable::Exe))
+            {
+                auto fileName = std::filesystem::path(app.path).filename();
+                auto fileNameUpper = StringUtils::ToUpper(fileName);
+                installPathUpper.append(L"\\").append(fileNameUpper);
+                installPath.append(L"\\").append(fileName);
+            }
+
+            auto appFileName = StringUtils::ToUpper(std::filesystem::path(app.path).filename());
+            auto installedAppFileName = StringUtils::ToUpper(std::filesystem::path(installPathUpper).filename());
+            if (appFileName != installedAppFileName) // Discord or other electron apps
+            {
+                try
+                {
+                    auto parentPath = StringUtils::ToUpper(std::filesystem::path(app.path).parent_path().parent_path());
+                    auto installedParentPath = StringUtils::ToUpper(std::filesystem::path(installPath).parent_path());
+                    if (parentPath == installedParentPath)
+                    {
+                        for (auto const& dirEntry : std::filesystem::recursive_directory_iterator{ std::filesystem::path(installPath).parent_path() })
+                        {
+                            Logger::debug(dirEntry.path().c_str());
+                            if (StringUtils::ToUpper(std::filesystem::path(dirEntry).filename()) == appFileName)
+                            {
+                                Logger::trace(L"Updated app path: {} -> {}", app.path, dirEntry.path().c_str());
+                                app.path = dirEntry.path();
+                                updated = true;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Logger::trace(L"Updating app version: different file names, won't update path");
+                    }
+                }
+                catch (std::exception& ex)
+                {
+                    Logger::error("Error updating path: {}", ex.what());
+                }
+                
+                return updated;
+            }
+
+            if (installPathUpper != appPathUpper)
+            {
+                Logger::trace(L"Updated app path: {} -> {}", app.path, installPath);
+                app.path = installPath;
+            }
+            
+            return updated;
+        }
+
+        bool UpdateWorkspacesApps(WorkspacesData::WorkspacesProject& workspace, const AppList& installedApps)
+        {
+            bool updated = false;
+            for (auto& app : workspace.apps)
+            {
+                updated |= UpdateAppVersion(app, installedApps);
+            }
+
+            return updated;
+        }
+
     }
 }

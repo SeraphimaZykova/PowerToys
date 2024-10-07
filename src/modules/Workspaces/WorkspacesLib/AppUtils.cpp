@@ -398,12 +398,15 @@ namespace Utils
                     {
                         for (auto const& dirEntry : std::filesystem::recursive_directory_iterator{ std::filesystem::path(installPath).parent_path() })
                         {
-                            Logger::debug(dirEntry.path().c_str());
                             if (StringUtils::ToUpper(std::filesystem::path(dirEntry).filename()) == appFileName)
                             {
-                                Logger::trace(L"Updated app path: {} -> {}", app.path, dirEntry.path().c_str());
-                                app.path = dirEntry.path();
-                                updated = true;
+                                if (appPathUpper != StringUtils::ToUpper(dirEntry.path()))
+                                {
+                                    Logger::trace(L"Updated app path: {} -> {}", app.path, dirEntry.path().c_str());
+                                    app.path = dirEntry.path();
+                                    updated = true; 
+                                }
+
                                 break;
                             }
                         }

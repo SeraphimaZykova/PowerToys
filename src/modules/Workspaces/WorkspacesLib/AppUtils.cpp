@@ -33,6 +33,16 @@ namespace Utils
             constexpr const wchar_t* Exe = L".EXE";
         }
 
+        namespace StringUtils
+        {
+            std::wstring ToUpper(const std::wstring& str)
+            {
+                std::wstring upper(str);
+                std::transform(upper.begin(), upper.end(), upper.begin(), towupper);
+                return upper;
+            }
+        }
+
         AppList IterateAppsFolder()
         {
             AppList result{};
@@ -350,6 +360,8 @@ namespace Utils
                 return false;
             }
 
+            bool updated = false;
+
             // Packaged apps have version in the path, it will be outdated after update.
             // We need make sure the current package is up to date.
             if (!app.packageFullName.empty())
@@ -360,8 +372,70 @@ namespace Utils
                     app.packageFullName = installedApp->packageFullName;
                     app.path = installedApp->installPath + L"\\" + exeFileName;
                     Logger::trace(L"Updated package full name for {}: {}", app.name, app.packageFullName);
-                    return true;
+                    updated = true;
                 }
+            }
+
+            std::wstring installPath = installedApp->installPath;
+            std::wstring installPathUpper = StringUtils::ToUpper(installedApp->installPath);
+            std::wstring appPathUpper = StringUtils::ToUpper(app.path);
+
+            // edge case: File Explorer
+            if (appPathUpper == NonLocalizable::FileExplorerPath)
+            {
+                return updated;
+            }
+
+            if (!installPathUpper.ends_with(NonLocalizable::Exe) && appPathUpper.ends_with(NonLocalizable::Exe))
+            {
+                auto fileName = std::filesystem::path(app.path).filename();
+                auto fileNameUpper = StringUtils::ToUpper(fileName);
+                installPathUpper.append(L"\\").append(fileNameUpper);
+                installPath.append(L"\\").append(fileName);
+            }
+
+            auto appFileName = StringUtils::ToUpper(std::filesystem::path(app.path).filename());
+            auto installedAppFileName = StringUtils::ToUpper(std::filesystem::path(installPathUpper).filename());
+            if (appFileName != installedAppFileName) // Discord or other electron apps
+            {
+                try
+                {
+                    auto parentPath = StringUtils::ToUpper(std::filesystem::path(app.path).parent_path().parent_path());
+                    auto installedParentPath = StringUtils::ToUpper(std::filesystem::path(installPath).parent_path());
+                    if (parentPath == installedParentPath)
+                    {
+                        for (auto const& dirEntry : std::filesystem::recursive_directory_iterator{ std::filesystem::path(installPath).parent_path() })
+                        {
+                            if (StringUtils::ToUpper(std::filesystem::path(dirEntry).filename()) == appFileName)
+                            {
+                                if (appPathUpper != StringUtils::ToUpper(dirEntry.path()))
+                                {
+                                    Logger::trace(L"Updated app path: {} -> {}", app.path, dirEntry.path().c_str());
+                                    app.path = dirEntry.path();
+                                    updated = true;
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Logger::trace(L"Updating app {} version: different file names, won't update path", app.name);
+                    }
+                }
+                catch (std::exception& ex)
+                {
+                    Logger::error("Error updating path: {}", ex.what());
+                }
+
+                return updated;
+            }
+
+            if (installPathUpper != appPathUpper)
+            {
+                Logger::trace(L"Updated app path: {} -> {}", app.path, installPath);
+                app.path = installPath;
             }
 
             return false;
